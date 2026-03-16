@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Assistant | Premium Intelligence</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020617;
+            --card-bg: rgba(15, 23, 42, 0.6);
+            --accent-zoho: #38bdf8;
+            --accent-sap: #a855f7;
+            --text: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --success: #10b981;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #020617 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 30px;
+            overflow-x: hidden;
+        }
+        .nav-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 40px; padding: 20px;
+            background: var(--glass); backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: 20px;
+        }
+        .logo { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
+        .logo span { background: linear-gradient(90deg, var(--accent-zoho), var(--accent-sap)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .platform-switch { display: flex; gap: 10px; }
+        .btn { 
+            padding: 8px 20px; border-radius: 12px; border: 1px solid var(--border);
+            background: transparent; color: white; cursor: pointer; font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        .btn.active-zoho { background: var(--accent-zoho); color: #020617; font-weight: 600; border-color: var(--accent-zoho); }
+        .btn.active-sap { background: var(--accent-sap); color: white; font-weight: 600; border-color: var(--accent-sap); }
+
+        .dashboard-grid { 
+            display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; 
+            animation: fadeIn 0.8s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card {
+            background: var(--card-bg); backdrop-filter: blur(16px);
+            border: 1px solid var(--border); border-radius: 24px;
+            padding: 24px; position: relative; overflow: hidden;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+        .card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .span-4 { grid-column: span 4; }
+        .span-8 { grid-column: span 8; }
+        .span-12 { grid-column: span 12; }
+
+        .metric { display: flex; flex-direction: column; }
+        .metric-label { font-size: 0.8rem; opacity: 0.5; text-transform: uppercase; letter-spacing: 1.5px; }
+        .metric-value { font-size: 2.5rem; font-weight: 700; margin: 5px 0; }
+        .metric-trend { font-size: 0.8rem; color: var(--success); display: flex; align-items: center; gap: 4px; }
+
+        h3 { font-size: 1.1rem; margin-bottom: 20px; font-weight: 600; opacity: 0.9; }
+
+        .ai-pulse {
+            position: absolute; top: 20px; right: 20px; width: 8px; height: 8px;
+            background: var(--success); border-radius: 50%;
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 0.4; scale: 1; } 50% { opacity: 1; scale: 1.4; } 100% { opacity: 0.4; scale: 1; } }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; font-size: 0.75rem; opacity: 0.4; border-bottom: 1px solid var(--border); }
+        td { padding: 16px 12px; font-size: 0.9rem; border-bottom: 1px solid var(--border); }
+        .status-pill { 
+            padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700;
+            background: rgba(255,255,255,0.1); text-transform: uppercase;
+        }
+        .status-open { color: var(--accent-zoho); border: 1px solid var(--accent-zoho); }
+        .status-inprogress { color: #fbbf24; border: 1px solid #fbbf24; }
+        .status-closed { color: var(--success); border: 1px solid var(--success); }
+
+        /* Chart Styling */
+        .chart-container { height: 250px; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="nav-header">
+        <div class="logo"><span>Intelligence</span> Assistant</div>
+        <div class="platform-switch" id="platform-switch">
+            <button class="btn active-zoho" onclick="switchPlatform('zoho')">Zoho Projects</button>
+            <button class="btn" onclick="switchPlatform('sap')">SAP S/4HANA</button>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Metrics -->
+        <div class="card span-4">
+            <div class="ai-pulse"></div>
+            <div class="metric">
+                <span class="metric-label">Active Workstreams</span>
+                <span class="metric-value" id="val-projects">--</span>
+                <span class="metric-trend">↑ 12% from last week</span>
+            </div>
+        </div>
+        <div class="card span-4">
+            <div class="metric">
+                <span class="metric-label">Pending Actions</span>
+                <span class="metric-value" id="val-tasks">--</span>
+                <span class="metric-trend">AI Priority: High</span>
+            </div>
+        </div>
+        <div class="card span-4">
+            <div class="metric">
+                <span class="metric-label">System Health</span>
+                <span class="metric-value" style="color: var(--success)">Optimal</span>
+                <span class="metric-trend">All integrations active</span>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="card span-8">
+            <h3 id="chart-title">Integration Velocity</h3>
+            <div class="chart-container">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </div>
+        <div class="card span-4">
+            <h3>Resource Allocation</h3>
+            <div class="chart-container">
+                <canvas id="resourceChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="card span-12">
+            <h3 id="table-title">Critical Path Analysis</h3>
+            <table id="data-table">
+                <thead>
+                    <tr id="table-head">
+                        <!-- Dynamic -->
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Dynamic -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let currentPlatform = 'zoho';
+        let rawData = null;
+        let mainChart = null;
+        let resourceChart = null;
+
+        async function init() {
+            const res = await fetch('/api/dashboard');
+            rawData = await res.json();
+            render();
+        }
+
+        function switchPlatform(p) {
+            currentPlatform = p;
+            const btns = document.querySelectorAll('.platform-switch .btn');
+            btns[0].className = p === 'zoho' ? 'btn active-zoho' : 'btn';
+            btns[1].className = p === 'sap' ? 'btn active-sap' : 'btn';
+            render();
+        }
+
+        function render() {
+            if (!rawData) return;
+            
+            const data = currentPlatform === 'zoho' ? rawData.projects : rawData.sapProjects;
+            const tasks = currentPlatform === 'zoho' ? rawData.tasks : [];
+
+            document.getElementById('val-projects').innerText = data.length;
+            document.getElementById('val-tasks').innerText = currentPlatform === 'zoho' ? rawData.tasks.length : '--';
+            document.getElementById('chart-title').innerText = currentPlatform === 'zoho' ? 'Zoho Project Progression' : 'SAP ERP Instance Status';
+            document.getElementById('table-title').innerText = currentPlatform === 'zoho' ? 'Active Project Tracks' : 'SAP S/4HANA Module Sync';
+
+            // Project Chart (mock values for visualization)
+            if (mainChart) mainChart.destroy();
+            mainChart = new Chart(document.getElementById('mainChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: data.map(i => i.name),
+                    datasets: [{
+                        label: 'Completion %',
+                        data: data.map(i => i.percent_complete || (i.status === 'In-Progress' ? 45 : 10)),
+                        backgroundColor: currentPlatform === 'zoho' ? '#38bdf8' : '#a855f7',
+                        borderRadius: 8,
+                        barThickness: 30
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    onClick: (evt, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const projectName = data[index].name;
+                            filterTable(projectName);
+                        }
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: (ctx) => `Progress: ${ctx.raw}% (Click to Filter)` } }
+                    },
+                    scales: { 
+                        y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.5)' } },
+                        x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.5)' } }
+                    }
+                }
+            });
+
+            // Resource Chart
+            if (resourceChart) resourceChart.destroy();
+            resourceChart = new Chart(document.getElementById('resourceChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: rawData.teamUtilization.map(u => u.team),
+                    datasets: [{
+                        data: rawData.teamUtilization.map(u => u.avgUtilization),
+                        backgroundColor: ['#38bdf8', '#818cf8', '#fb7185', '#a855f7'],
+                        borderWidth: 0,
+                        hoverOffset: 20
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,0.7)', font: { size: 10 } } } },
+                    cutout: '70%'
+                }
+            });
+
+            // Initial Table Render
+            renderTable(data);
+        }
+
+        function filterTable(name) {
+            const data = currentPlatform === 'zoho' ? rawData.projects : rawData.sapProjects;
+            const filtered = data.filter(p => p.name === name);
+            renderTable(filtered, true);
+        }
+
+        function renderTable(displayData, isFiltered = false) {
+            const head = document.getElementById('table-head');
+            const body = document.getElementById('table-body');
+            body.innerHTML = '';
+
+            if (isFiltered) {
+                document.getElementById('table-title').innerHTML = `${currentPlatform === 'zoho' ? 'Project' : 'SAP Module'} Detail: <span style="color: var(${currentPlatform === 'zoho' ? '--accent-zoho' : '--accent-sap'})">${displayData[0].name}</span> <button onclick="render()" style="font-size: 0.7rem; background: none; border: 1px solid var(--border); color: var(--text); padding: 2px 8px; border-radius: 4px; margin-left: 10px; cursor: pointer;">Reset View</button>`;
+            } else {
+                document.getElementById('table-title').innerText = currentPlatform === 'zoho' ? 'Active Project Tracks' : 'SAP S/4HANA Module Sync';
+            }
+
+            if (currentPlatform === 'zoho') {
+                head.innerHTML = '<th>PROJECT TRACK</th><th>OWNER</th><th>TIMELINE</th><th>STATUS</th>';
+                displayData.forEach(p => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight: 600">${p.name}</td>
+                        <td style="opacity: 0.7">${p.owner_name}</td>
+                        <td style="font-family: monospace; font-size: 0.8rem">${p.start_date} → ${p.end_date}</td>
+                        <td><span class="status-pill status-${p.status}">${p.status}</span></td>
+                    `;
+                    body.appendChild(tr);
+                });
+            } else {
+                head.innerHTML = '<th>SAP MODULE ID</th><th>DESCRIPTION</th><th>STATE</th><th>PRIORITY</th>';
+                displayData.forEach(p => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight: 600">${p.id}</td>
+                        <td style="opacity: 0.7">${p.name}</td>
+                        <td><span class="status-pill">${p.status}</span></td>
+                        <td style="color: #f87171">CRITICAL</td>
+                    `;
+                    body.appendChild(tr);
+                });
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

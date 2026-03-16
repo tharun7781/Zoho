@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.11/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.11",
+  "version": "1.0.0",
+  "id": "zoho-teams-assistant-001",
+  "packageName": "com.zoho.teams.assistant",
+  "developer": {
+    "name": "Zoho Integrations",
+    "websiteUrl": "https://www.zoho.com",
+    "privacyUrl": "https://www.zoho.com/privacy.html",
+    "termsOfUseUrl": "https://www.zoho.com/terms.html"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "Zoho Assistant",
+    "full": "Zoho Project Integration Assistant"
+  },
+  "description": {
+    "short": "Manage Zoho Projects in Teams",
+    "full": "Query, view and act upon your project data directly within Teams using natural language and Adaptive Cards."
+  },
+  "accentColor": "#38BDF8",
+  "bots": [
+    {
+      "botId": "${MICROSOFT_APP_ID}",
+      "scopes": ["personal", "team", "groupchat"],
+      "supportsFiles": false,
+      "isNotificationOnly": false
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": ["*.groq.com", "*.zoho.com", "localhost"]
+}
