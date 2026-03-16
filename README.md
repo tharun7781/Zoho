@@ -33,7 +33,16 @@ This project satisfies all **Core Requirements**:
 
 ---
 
-## 📦 Deployment
+## ☁️ Cloud Hosting (Python / Streamlit)
+If you need a live, public URL for your assessment, use the included Streamlit port:
+1. Push this repo to GitHub.
+2. Connect it to **[Streamlit Cloud](https://share.streamlit.io)**.
+3. Select `streamlit_app.py` as the main file.
+- **Demo URL Example**: `https://zoho-assistant.streamlit.app`
+
+---
+
+## 📦 Local Deployment (Docker)
 - **Docker**: `docker-compose up --build`
 - **Azure**: Deployment YAML included in `./deploy/azure-deploy.yml`.
 
