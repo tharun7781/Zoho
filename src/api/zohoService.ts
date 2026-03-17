@@ -2,6 +2,7 @@
 import { config } from "../config/config";
 import {
   MOCK_PROJECTS, MOCK_TASKS, MOCK_USERS, MOCK_PORTAL,
+  MOCK_SAP_PROJECTS, MOCK_SAP_TASKS,
   calculateUtilization, calculateTeamUtilization,
   MockProject, MockTask, MockUser, UserUtilization, TeamUtilization,
 } from "../data/mockData";
@@ -41,27 +42,60 @@ export async function assignTask(
   _userId: string,
   taskId: string,
   assigneeId: string
-): Promise<MockTask> {
+): Promise<any> {
+  // Check Zoho Tasks
   const task = MOCK_TASKS.find((t) => t.id === taskId);
-  if (!task) throw new Error(`Task ${taskId} not found`);
-  const user = MOCK_USERS.find((u) => u.id === assigneeId);
-  if (!user) throw new Error(`User ${assigneeId} not found`);
-  // mutate in-memory mock
-  task.assignee_id = user.id;
-  task.assignee_name = user.name;
-  return task;
+  if (task) {
+    const user = MOCK_USERS.find((u) => u.id === assigneeId);
+    if (!user) throw new Error(`User ${assigneeId} not found`);
+    task.assignee_id = user.id;
+    task.assignee_name = user.name;
+    return task;
+  }
+
+  // Check SAP Tasks/Projects (for demo, we just return success or update a stub)
+  const sapTask = MOCK_SAP_TASKS.find(t => t.id === taskId);
+  if (sapTask) {
+    return { ...sapTask, assignee_id: assigneeId };
+  }
+
+  const sapProj = MOCK_SAP_PROJECTS.find(p => p.id === taskId);
+  if (sapProj) {
+    return { ...sapProj, assignee_id: assigneeId };
+  }
+
+  throw new Error(`Task/Project ${taskId} not found`);
 }
 
 export async function updateTaskStatus(
   _userId: string,
   taskId: string,
-  status: MockTask["status"]
-): Promise<MockTask> {
+  status: any
+): Promise<any> {
+  // Check Zoho Tasks
   const task = MOCK_TASKS.find((t) => t.id === taskId);
-  if (!task) throw new Error(`Task ${taskId} not found`);
-  task.status = status;
-  if (status === "closed") task.percent_complete = 100;
-  return task;
+  if (task) {
+    task.status = status;
+    if (status === "closed") task.percent_complete = 100;
+    return task;
+  }
+
+  // Check SAP Tasks
+  const sapTask = MOCK_SAP_TASKS.find(t => t.id === taskId);
+  if (sapTask) {
+    sapTask.status = status.charAt(0).toUpperCase() + status.slice(1);
+    return sapTask;
+  }
+
+  // Check SAP Projects (Dashboards sometimes update project status directly)
+  const sapProj = MOCK_SAP_PROJECTS.find(p => p.id === taskId);
+  if (sapProj) {
+    sapProj.status = status.charAt(0).toUpperCase() + status.slice(1);
+    if (status === 'closed' || status === 'Completed') sapProj.percent_complete = 100;
+    return sapProj;
+  }
+
+  throw new Error(`Task/Project ${taskId} not found`);
 }
 
 // ── Users ─────────────────────────────────────────────────────
@@ -89,14 +123,9 @@ export async function getTeamUtilization(_userId: string): Promise<TeamUtilizati
  * To enable: switch config.zoho.useMockData to false and implement the service call.
  */
 export async function getSapProjects(_userId: string): Promise<any[]> {
-    return [
-        { id: "sap_01", name: "ERP System Migration", status: "In-Progress" },
-        { id: "sap_02", name: "Supply Chain Optimization", status: "Planning" }
-    ];
+    return MOCK_SAP_PROJECTS;
 }
 
 export async function getSapTasks(_userId: string, sapProjectId: string): Promise<any[]> {
-    return [
-        { id: "st_01", name: "Configure Warehouse Management", status: "Open" }
-    ];
+    return MOCK_SAP_TASKS.filter(p => p.project_id === sapProjectId);
 }

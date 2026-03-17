@@ -43,6 +43,24 @@ export interface MockProject {
   task_count: { open: number; inprogress: number; closed: number };
 }
 
+export interface MockSapProject {
+  id: string;
+  name: string;
+  status: "Planning" | "In-Progress" | "Completed";
+  owner_name: string;
+  start_date: string;
+  end_date: string;
+  percent_complete: number;
+  team: string;
+}
+
+export interface MockSapTask {
+  id: string;
+  name: string;
+  status: "Open" | "In-Progress" | "Closed";
+  project_id: string;
+}
+
 // ── Portal ────────────────────────────────────────────────────
 export const MOCK_PORTAL = {
   id: "portal_001",
@@ -104,6 +122,18 @@ export const MOCK_PROJECTS: MockProject[] = [
     description: "New brand guidelines, assets, and marketing collateral",
     task_count: { open: 2, inprogress: 3, closed: 15 },
   },
+];
+
+// ── SAP Data ──────────────────────────────────────────────────
+export const MOCK_SAP_PROJECTS: MockSapProject[] = [
+  { id: "sap_01", name: "ERP System Migration", status: "In-Progress", owner_name: "Alice Johnson", start_date: "01-10-2026", end_date: "04-15-2026", percent_complete: 45, team: "Finance" },
+  { id: "sap_02", name: "Supply Chain Optimization", status: "Planning", owner_name: "Bob Martinez", start_date: "02-20-2026", end_date: "06-30-2026", percent_complete: 15, team: "Logistics" }
+];
+
+export const MOCK_SAP_TASKS: MockSapTask[] = [
+  { id: "st_01", name: "Configure Warehouse Management", status: "In-Progress", project_id: "sap_01" },
+  { id: "st_02", name: "User Acceptance Testing (ST)", status: "Open", project_id: "sap_01" },
+  { id: "st_03", name: "Data Mapping (SAP)", status: "Open", project_id: "sap_02" }
 ];
 
 // ── Tasks ─────────────────────────────────────────────────────

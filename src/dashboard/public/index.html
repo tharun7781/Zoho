@@ -10,19 +10,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #020617;
-            --card-bg: rgba(15, 23, 42, 0.6);
-            --accent-zoho: #38bdf8;
-            --accent-sap: #a855f7;
-            --text: #f8fafc;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --accent-zoho: #0ea5e9;
+            --accent-sap: #8b5cf6;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --glass: rgba(255, 255, 255, 0.8);
+            --border: #e2e8f0;
             --success: #10b981;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
             font-family: 'Outfit', sans-serif; 
-            background: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #020617 100%);
+            background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             padding: 30px;
@@ -31,19 +32,20 @@
         .nav-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 40px; padding: 20px;
-            background: var(--glass); backdrop-filter: blur(20px);
+            background: var(--card-bg);
             border: 1px solid var(--border); border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
         .logo { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
-        .logo span { background: linear-gradient(90deg, var(--accent-zoho), var(--accent-sap)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo span { color: var(--accent-zoho); }
         
         .platform-switch { display: flex; gap: 10px; }
         .btn { 
             padding: 8px 20px; border-radius: 12px; border: 1px solid var(--border);
-            background: transparent; color: white; cursor: pointer; font-family: inherit;
+            background: transparent; color: var(--text-muted); cursor: pointer; font-family: inherit;
             transition: all 0.3s ease;
         }
-        .btn.active-zoho { background: var(--accent-zoho); color: #020617; font-weight: 600; border-color: var(--accent-zoho); }
+        .btn.active-zoho { background: var(--accent-zoho); color: white; font-weight: 600; border-color: var(--accent-zoho); }
         .btn.active-sap { background: var(--accent-sap); color: white; font-weight: 600; border-color: var(--accent-sap); }
 
         .dashboard-grid { 
@@ -53,15 +55,10 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .card {
-            background: var(--card-bg); backdrop-filter: blur(16px);
+            background: var(--card-bg);
             border: 1px solid var(--border); border-radius: 24px;
             padding: 24px; position: relative; overflow: hidden;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-        }
-        .card::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
-            pointer-events: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         }
 
         .span-4 { grid-column: span 4; }
@@ -69,45 +66,146 @@
         .span-12 { grid-column: span 12; }
 
         .metric { display: flex; flex-direction: column; }
-        .metric-label { font-size: 0.8rem; opacity: 0.5; text-transform: uppercase; letter-spacing: 1.5px; }
-        .metric-value { font-size: 2.5rem; font-weight: 700; margin: 5px 0; }
+        .metric-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
+        .metric-value { font-size: 2.5rem; font-weight: 700; margin: 5px 0; color: var(--text); }
         .metric-trend { font-size: 0.8rem; color: var(--success); display: flex; align-items: center; gap: 4px; }
 
-        h3 { font-size: 1.1rem; margin-bottom: 20px; font-weight: 600; opacity: 0.9; }
+        h3 { font-size: 1.1rem; margin-bottom: 20px; font-weight: 600; color: var(--text); }
 
         .ai-pulse {
             position: absolute; top: 20px; right: 20px; width: 8px; height: 8px;
             background: var(--success); border-radius: 50%;
-            box-shadow: 0 0 10px var(--success);
             animation: pulse 2s infinite;
         }
         @keyframes pulse { 0% { opacity: 0.4; scale: 1; } 50% { opacity: 1; scale: 1.4; } 100% { opacity: 0.4; scale: 1; } }
 
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; font-size: 0.75rem; opacity: 0.4; border-bottom: 1px solid var(--border); }
+        th { text-align: left; padding: 12px; font-size: 0.75rem; color: var(--text-muted); border-bottom: 1px solid var(--border); }
         td { padding: 16px 12px; font-size: 0.9rem; border-bottom: 1px solid var(--border); }
         .status-pill { 
             padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700;
-            background: rgba(255,255,255,0.1); text-transform: uppercase;
+            background: #f1f5f9; text-transform: uppercase;
         }
-        .status-open { color: var(--accent-zoho); border: 1px solid var(--accent-zoho); }
-        .status-inprogress { color: #fbbf24; border: 1px solid #fbbf24; }
-        .status-closed { color: var(--success); border: 1px solid var(--success); }
+        .status-open { color: var(--accent-zoho); }
+        .status-inprogress { color: #d97706; }
+        .status-closed { color: var(--success); }
 
         /* Chart Styling */
         .chart-container { height: 250px; width: 100%; }
+
+        /* Action Center Styling */
+        .action-center {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+        .action-group {
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        select, input {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            color: var(--text); padding: 10px; border-radius: 12px;
+            font-family: inherit; width: 100%;
+        }
+        .btn-update {
+            background: var(--accent-zoho); color: white;
+            border: none; padding: 12px; border-radius: 12px;
+            font-weight: 600; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-update:hover { background: #0284c7; transform: translateY(-2px); }
+        .span-12.action-card { margin-top: 20px; }
+        
+        .logout-btn {
+            font-size: 0.8rem; color: #ef4444; cursor: pointer; text-decoration: underline; margin-left: 20px;
+        }
+
+        /* Search Styling */
+        .search-container {
+            flex: 1; margin: 0 30px; display: flex; gap: 10px; position: relative;
+        }
+        #ai-search-input {
+            flex: 1; background: #f1f5f9; border: 1px solid var(--border);
+            border-radius: 12px; padding: 10px 20px; font-family: inherit;
+        }
+        .btn-search {
+            background: var(--accent-zoho); color: white; border: none;
+            border-radius: 12px; padding: 10px 20px; font-weight: 600; cursor: pointer;
+        }
+        .search-result-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+        }
+        .search-result-modal {
+            background: white; padding: 30px; border-radius: 24px; width: 90%; max-width: 600px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
     </style>
+    <script>
+        if (localStorage.getItem('userAuth') !== 'true') {
+            window.location.href = 'login.html';
+        }
+        function logout() {
+            localStorage.removeItem('userAuth');
+            window.location.href = 'login.html';
+        }
+    </script>
 </head>
 <body>
     <div class="nav-header">
-        <div class="logo"><span>Intelligence</span> Assistant</div>
+        <div class="logo"><span>Intelligence</span> Assistant <span style="font-size: 0.6rem; background: var(--accent-zoho); color: white; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 10px;">V2.0 ACTIVE</span></div>
+        
+        <div class="search-container">
+            <input type="text" id="ai-search-input" placeholder="Ask AI: 'list tasks', 'team utilization'..." onkeypress="if(event.key==='Enter')handleAISearch()">
+            <button class="btn-search" onclick="handleAISearch()">Query AI</button>
+        </div>
+
         <div class="platform-switch" id="platform-switch">
             <button class="btn active-zoho" onclick="switchPlatform('zoho')">Zoho Projects</button>
             <button class="btn" onclick="switchPlatform('sap')">SAP S/4HANA</button>
+            <span class="logout-btn" onclick="logout()">Logout</span>
+        </div>
+    </div>
+
+    <div class="search-result-overlay" id="search-overlay" onclick="closeSearch()">
+        <div class="search-result-modal" onclick="event.stopPropagation()">
+            <h3 id="search-title">AI Query Result</h3>
+            <p id="search-message" style="margin-bottom: 20px; color: var(--text-muted);"></p>
+            <div id="search-data" style="max-height: 300px; overflow-y: auto;"></div>
+            <button class="btn-update" style="margin-top: 20px; width: 100%;" onclick="closeSearch()">Close Result</button>
         </div>
     </div>
 
     <div class="dashboard-grid">
+        <!-- Action Center (TOP PRIORITY) -->
+        <div class="card span-12 action-card" style="border: 1px solid var(--accent-zoho);">
+            <h3 style="color: var(--accent-zoho);">⚡ AI Action Intelligence Center (Interactive)</h3>
+            <div class="action-center">
+                <div class="action-group">
+                    <label style="font-size: 0.8rem; opacity: 0.6;">Update Task Status</label>
+                    <select id="task-select-status">
+                        <!-- Dynamic -->
+                    </select>
+                    <select id="status-select">
+                        <option value="open">Open</option>
+                        <option value="inprogress">In Progress</option>
+                        <option value="testing">Testing</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                    <button class="btn-update" onclick="updateStatus()">Update Task Status</button>
+                </div>
+                <div class="action-group">
+                    <label style="font-size: 0.8rem; opacity: 0.6;">Reassign Resource</label>
+                    <select id="task-select-assign">
+                        <!-- Dynamic -->
+                    </select>
+                    <select id="user-select">
+                        <option value="u1">Bob Martinez (Engineering)</option>
+                        <option value="u2">Alice Johnson (Design)</option>
+                        <option value="u3">David Lee (QA)</option>
+                    </select>
+                    <button class="btn-update" style="background: var(--accent-sap); color: white;" onclick="assignTask()">Assign New Owner</button>
+                </div>
+            </div>
+        </div>
         <!-- Metrics -->
         <div class="card span-4">
             <div class="ai-pulse"></div>
@@ -221,8 +319,8 @@
                         tooltip: { callbacks: { label: (ctx) => `Progress: ${ctx.raw}% (Click to Filter)` } }
                     },
                     scales: { 
-                        y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.5)' } },
-                        x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.5)' } }
+                        y: { beginAtZero: true, max: 100, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#64748b' } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b' } }
                     }
                 }
             });
@@ -249,6 +347,20 @@
 
             // Initial Table Render
             renderTable(data);
+
+            // Update Action Center Pickers
+            const taskSelectStatus = document.getElementById('task-select-status');
+            const taskSelectAssign = document.getElementById('task-select-assign');
+            
+            if (currentPlatform === 'zoho') {
+                const options = rawData.tasks.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+                taskSelectStatus.innerHTML = options;
+                taskSelectAssign.innerHTML = options;
+            } else {
+                const options = rawData.sapProjects.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+                taskSelectStatus.innerHTML = options;
+                taskSelectAssign.innerHTML = options;
+            }
         }
 
         function filterTable(name) {
@@ -281,18 +393,96 @@
                     body.appendChild(tr);
                 });
             } else {
-                head.innerHTML = '<th>SAP MODULE ID</th><th>DESCRIPTION</th><th>STATE</th><th>PRIORITY</th>';
+                head.innerHTML = '<th>SAP MODULE</th><th>OWNER</th><th>TIMELINE</th><th>STATUS</th>';
                 displayData.forEach(p => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td style="font-weight: 600">${p.id}</td>
-                        <td style="opacity: 0.7">${p.name}</td>
-                        <td><span class="status-pill">${p.status}</span></td>
-                        <td style="color: #f87171">CRITICAL</td>
+                        <td style="font-weight: 600">${p.name}</td>
+                        <td style="opacity: 0.7">${p.owner_name}</td>
+                        <td style="font-family: monospace; font-size: 0.8rem">${p.start_date} → ${p.end_date}</td>
+                        <td><span class="status-pill status-closed">${p.status}</span></td>
                     `;
                     body.appendChild(tr);
                 });
             }
+        }
+
+        async function updateStatus() {
+            const taskId = document.getElementById('task-select-status').value;
+            const status = document.getElementById('status-select').value;
+            
+            const res = await fetch('/api/update-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ taskId, status })
+            });
+            
+            if (res.ok) {
+                alert('✅ Status updated successfully!');
+                init(); // Refresh data
+            }
+        }
+
+        async function assignTask() {
+            const taskId = document.getElementById('task-select-assign').value;
+            const assigneeId = document.getElementById('user-select').value;
+            
+            const res = await fetch('/api/assign-task', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ taskId, assigneeId })
+            });
+            
+            if (res.ok) {
+                alert('👤 Resource assigned successfully!');
+                init(); // Refresh data
+            }
+        }
+
+        async function handleAISearch() {
+            const query = document.getElementById('ai-search-input').value;
+            if (!query) return;
+
+            const btn = document.querySelector('.btn-search');
+            btn.innerText = 'Consulting AI...';
+            btn.disabled = true;
+
+            const res = await fetch('/api/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query })
+            });
+            
+            const result = await res.json();
+            btn.innerText = 'Query AI';
+            btn.disabled = false;
+
+            if (result.success) {
+                document.getElementById('search-overlay').style.display = 'flex';
+                document.getElementById('search-message').innerText = result.message;
+                
+                const dataDiv = document.getElementById('search-data');
+                dataDiv.innerHTML = '';
+
+                if (result.data && Array.isArray(result.data)) {
+                    const table = document.createElement('table');
+                    table.innerHTML = `<thead><tr><th>Attribute</th><th>Value</th></tr></thead><tbody></tbody>`;
+                    const tbody = table.querySelector('tbody');
+                    
+                    result.data.slice(0, 5).forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${item.name || item.team || item.id}</td><td>${item.status || item.avgUtilization + '%' || 'Active'}</td>`;
+                        tbody.appendChild(tr);
+                    });
+                    dataDiv.appendChild(table);
+                } else {
+                    dataDiv.innerHTML = `<p style="text-align: center; opacity: 0.5;">Detailed data available in standard dashboard views.</p>`;
+                }
+            }
+        }
+
+        function closeSearch() {
+            document.getElementById('search-overlay').style.display = 'none';
         }
 
         init();

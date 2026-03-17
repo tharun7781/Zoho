@@ -5,13 +5,14 @@ import { logger } from "../utils/logger";
 const groq = new Groq({ apiKey: config.groq.apiKey });
 
 export interface IntentResponse {
-  intent: "list_projects" | "list_tasks" | "due_this_month" | "utilization" | "assign_task" | "update_status" | "help" | "unknown";
+  intent: "list_projects" | "list_tasks" | "show_my_tasks" | "due_this_month" | "utilization" | "assign_task" | "update_status" | "help" | "unknown";
   entities: {
     project_id?: string;
     task_id?: string;
     user_id?: string;
     status?: string;
     query_string?: string;
+    platform?: "zoho" | "sap";
   };
 }
 
@@ -32,7 +33,8 @@ INTENTS:
 
 EXAMPLES:
 "show my projects" -> {"intent": "list_projects", "entities": {}}
-"what is due this month?" -> {"intent": "due_this_month", "entities": {}}
+"list sap projects" -> {"intent": "list_projects", "entities": {"platform": "sap"}}
+"what is due this month in zoho?" -> {"intent": "due_this_month", "entities": {"platform": "zoho"}}
 "list tasks for p1" -> {"intent": "list_tasks", "entities": {"project_id": "p1"}}
 "who is overloaded?" -> {"intent": "utilization", "entities": {}}
 "assign task t1 to alice" -> {"intent": "assign_task", "entities": {"task_id": "t1", "query_string": "alice"}}
@@ -70,11 +72,16 @@ export async function parseIntent(message: string): Promise<IntentResponse> {
 /** Simple regex-based fallback if Groq is unavailable */
 function fallbackParser(message: string): IntentResponse {
   const m = message.toLowerCase();
-  if (m.includes("project")) return { intent: "list_projects", entities: {} };
-  if (m.includes("task")) return { intent: "list_tasks", entities: {} };
-  if (m.includes("utiliz") || m.includes("busy") || m.includes("load")) return { intent: "utilization", entities: {} };
-  if (m.includes("due")) return { intent: "due_this_month", entities: {} };
-  if (m.includes("assign")) return { intent: "assign_task", entities: {} };
-  if (m.includes("help")) return { intent: "help", entities: {} };
-  return { intent: "unknown", entities: { query_string: message } };
+  const platform = m.includes("sap") ? "sap" : (m.includes("zoho") ? "zoho" : undefined);
+  
+  const entities: any = { platform };
+  
+  if (m.includes("my task")) return { intent: "show_my_tasks", entities };
+  if (m.includes("project")) return { intent: "list_projects", entities };
+  if (m.includes("task")) return { intent: "list_tasks", entities };
+  if (m.includes("utiliz") || m.includes("busy") || m.includes("load")) return { intent: "utilization", entities };
+  if (m.includes("due")) return { intent: "due_this_month", entities };
+  if (m.includes("assign")) return { intent: "assign_task", entities };
+  if (m.includes("help")) return { intent: "help", entities };
+  return { intent: "unknown", entities: { ...entities, query_string: message } };
 }
