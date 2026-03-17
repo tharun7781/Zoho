@@ -62,12 +62,24 @@ platform = st.radio("Select Integration Platform", ["Zoho Projects", "SAP S/4HAN
 st.divider()
 st.markdown("### 🔍 AI Smart Search (Command Bar)")
 query = st.text_input("Ask AI: 'list all tasks', 'show team utilization'...", placeholder="Type your natural language query here...")
+
+def python_fallback_query(q):
+    """Simple keyword-based fallback for Streamlit Cloud."""
+    q = q.lower()
+    if "task" in q:
+        return "Fetched active tasks (Local Fallback)", st.session_state.projects
+    if "utilization" in q or "busy" in q:
+        return "Fetched team utilization metrics (Local Fallback)", st.session_state.utilization
+    if "sap" in q:
+        return "Fetched active SAP projects (Local Fallback)", st.session_state.sap_projects
+    return "AI Engine is offline. Try keywords like 'tasks', 'utilization', or 'sap'.", None
+
 if st.button("Query AI Intelligence"):
     if query:
         import requests
         try:
-            # Note: Port 4000 is our Node.js Dashboard Server
-            res = requests.post("http://localhost:4000/api/query", json={"query": query}, timeout=5)
+            # Try connecting to Node.js backend (works locally)
+            res = requests.post("http://localhost:4000/api/query", json={"query": query}, timeout=2)
             result = res.json()
             if result.get("success"):
                 st.info(f"🤖 AI Assistant: {result['message']}")
@@ -75,8 +87,13 @@ if st.button("Query AI Intelligence"):
                     st.dataframe(pd.DataFrame(result["data"]), use_container_width=True)
             else:
                 st.error("AI was unable to process this specific request.")
-        except Exception as e:
-            st.warning("⚠️ Connection to AI Engine failed. Ensure the Node.js server (Port 4000) is running.")
+        except Exception:
+            # Fallback for Streamlit Cloud deployment
+            msg, data = python_fallback_query(query)
+            st.warning(f"🌐 Cloud Mode: Using built-in intelligence engine.")
+            st.info(f"🤖 AI Assistant (Local): {msg}")
+            if data:
+                st.dataframe(pd.DataFrame(data), use_container_width=True)
 
 st.divider()
 # --- METRICS ---
